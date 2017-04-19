@@ -1,7 +1,7 @@
 package com.totoMauz.gameOfLife.model;
 
 import com.totoMauz.gameOfLife.view.IView;
-import com.totoMauz.gameOfLife.view.View;
+import com.totoMauz.gameOfLife.view.SwingView;
 
 public class Model implements IModel {
 	private boolean[][] currData;
@@ -11,10 +11,10 @@ public class Model implements IModel {
 	private IView view;
 
 	public Model(int x, int y) {
-		view = new View();
+		view = new SwingView();
 		currData = new boolean[x][y];
 		nextData = new boolean[x][y];
-		cursor = new Cursor(x, y);
+		cursor = new Cursor(x - 1, y - 1);
 	}
 
 	@Override

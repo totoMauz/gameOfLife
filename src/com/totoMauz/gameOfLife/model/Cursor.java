@@ -26,14 +26,14 @@ public class Cursor {
 
 	public void moveLeft() {
 		--x;
-		if (x > 0) {
+		if (x < 0) {
 			x = maxX;
 		}
 	}
 
 	public void moveUp() {
 		--y;
-		if (y > 0) {
+		if (y < 0) {
 			y = maxY;
 		}
 	}
