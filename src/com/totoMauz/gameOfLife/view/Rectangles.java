@@ -14,6 +14,10 @@ public class Rectangles extends JPanel {
 		this.setBounds(0, 0, data.length * RECT_SIZE, data.length * RECT_SIZE);
 	}
 
+	public void setNewData(final boolean[][] data) {
+		this.data = data;
+	}
+
 	@Override
 	protected void paintComponent(final Graphics g) {
 		super.paintComponent(g);

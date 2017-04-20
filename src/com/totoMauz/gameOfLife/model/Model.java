@@ -1,5 +1,6 @@
 package com.totoMauz.gameOfLife.model;
 
+import com.totoMauz.gameOfLife.control.IController;
 import com.totoMauz.gameOfLife.view.IView;
 import com.totoMauz.gameOfLife.view.SwingView;
 
@@ -10,8 +11,8 @@ public class Model implements IModel {
 
 	private IView view;
 
-	public Model(int x, int y) {
-		view = new SwingView();
+	public Model(final int x, final int y, final IController controller) {
+		view = new SwingView(controller);
 		currData = new boolean[x][y];
 		nextData = new boolean[x][y];
 		cursor = new Cursor(x - 1, y - 1);
@@ -24,6 +25,7 @@ public class Model implements IModel {
 				currData[x][y] = Math.random() >= 0.5;
 			}
 		}
+		view.updateView(currData);
 	}
 
 	@Override

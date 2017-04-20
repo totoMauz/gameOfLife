@@ -9,10 +9,11 @@ import javax.swing.JFrame;
 import com.totoMauz.gameOfLife.control.IController;
 
 public class SwingView extends JFrame implements IView {
-	private final JButton btnNext = new JButton();
-	private static IController controller;
+	private final JButton btnRnd = new JButton("(Re)Start");
+	private Rectangles rectangles;
+	private final IController controller;
 
-	public SwingView() {
+	public SwingView(final IController controller) {
 		super();
 		this.setTitle("Game of Life");
 		this.getContentPane().setLayout(null);
@@ -20,33 +21,28 @@ public class SwingView extends JFrame implements IView {
 		addControls();
 		this.setVisible(true);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.controller = controller;
 	}
 
 	private void addControls() {
-		btnNext.setText("Next Tick");
-		btnNext.setBounds(500, 0, 100, 30);
-
-		btnNext.addActionListener(new ActionListener() {
-
+		btnRnd.setBounds(500, 0, 100, 30);
+		btnRnd.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (SwingView.controller != null) {
-					SwingView.controller.nextTick();
-				}
+				controller.randomSeed();
 			}
 		});
-
-		this.add(btnNext);
+		this.add(btnRnd);
 	}
 
 	@Override
-	public void updateView(boolean[][] data) {
-		this.add(new Rectangles(data));
+	public void updateView(final boolean[][] data) {
+		if (rectangles == null) {
+			this.add(new Rectangles(data));
+		} else {
+			rectangles.setNewData(data);
+		}
 		this.revalidate();
 		this.repaint();
-	}
-
-	public static void setController(IController controller) {
-		SwingView.controller = controller;
 	}
 }
