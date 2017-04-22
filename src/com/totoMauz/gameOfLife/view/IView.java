@@ -1,5 +1,14 @@
 package com.totoMauz.gameOfLife.view;
 
+/**
+ * View the game of life.
+ */
 public interface IView {
-	void updateView(boolean[][] data);
+	/**
+	 * Render the latest game update.
+	 * 
+	 * @param data
+	 *            the new data to render
+	 */
+	void updateView(boolean[] data);
 }

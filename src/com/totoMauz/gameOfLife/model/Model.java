@@ -4,26 +4,42 @@ import com.totoMauz.gameOfLife.control.IController;
 import com.totoMauz.gameOfLife.view.IView;
 import com.totoMauz.gameOfLife.view.SwingView;
 
+/**
+ * Model implementation with a simple array holding the game data. Responsible
+ * for updating the view.
+ */
 public class Model implements IModel {
-	private boolean[][] currData;
-	private boolean[][] nextData;
-	private Cursor cursor;
+	public static int NUM_COLS;
+	public static int NUM_ROWS;
+	private final boolean[] currData;
+	private final boolean[] nextData;
+	private final Cursor cursor;
 
 	private IView view;
 
+	/**
+	 * Instantiate a new model
+	 * 
+	 * @param x
+	 *            number of rows of the game field.
+	 * @param y
+	 *            number of columns of the game field.
+	 * @param controller
+	 *            the controller to pass to the view.
+	 */
 	public Model(final int x, final int y, final IController controller) {
 		view = new SwingView(controller);
-		currData = new boolean[x][y];
-		nextData = new boolean[x][y];
-		cursor = new Cursor(x - 1, y - 1);
+		NUM_COLS = x;
+		NUM_ROWS = y;
+		currData = new boolean[NUM_COLS * NUM_ROWS];
+		nextData = new boolean[NUM_COLS * NUM_ROWS];
+		cursor = new Cursor();
 	}
 
 	@Override
 	public void initializeModel() {
-		for (int x = 0; x < currData.length; x++) {
-			for (int y = 0; y < currData[x].length; y++) {
-				currData[x][y] = Math.random() >= 0.5;
-			}
+		for (int i = 0; i < currData.length; i++) {
+			currData[i] = Math.random() >= 0.5;
 		}
 		view.updateView(currData);
 	}
@@ -32,81 +48,110 @@ public class Model implements IModel {
 	public void updateModel() {
 		getNewData();
 
-		for (int x = 0; x < nextData.length; x++) {
-			System.arraycopy(nextData[x], 0, currData[x], 0, currData[x].length);
-		}
+		System.arraycopy(nextData, 0, currData, 0, currData.length);
 
 		view.updateView(currData);
 	}
 
 	private void getNewData() {
-		for (int x = 0; x < currData.length; x++) {
-			for (int y = 0; y < currData[x].length; y++) {
-				updateCell(x, y, getNumberOfAliveNeighbours(x, y));
-			}
+		for (int i = 0; i < currData.length; i++) {
+			updateCell(i, getNumberOfAliveNeighbours(i));
 		}
 	}
 
-	private void updateCell(final int x, final int y, final int numberOfNeighbours) {
-		final boolean isCellAlive = currData[x][y];
+	private void updateCell(final int i, final int numberOfNeighbours) {
+		final boolean isCellAlive = currData[i];
 
 		if (isCellAlive) {
 			if (numberOfNeighbours < 2 || numberOfNeighbours > 3) {
-				nextData[x][y] = false;
+				nextData[i] = false;
 			} else {
-				nextData[x][y] = true;
+				nextData[i] = true;
 			}
 		} else {
 			if (numberOfNeighbours == 3) {
-				nextData[x][y] = true;
+				nextData[i] = true;
 			}
 		}
 	}
 
-	private int getNumberOfAliveNeighbours(final int x, final int y) {
+	private int getNumberOfAliveNeighbours(final int i) {
 		int aliveNeighbours = 0;
 
-		this.cursor.setPosition(x, y);
-		this.cursor.moveRight();
-		if (currData[this.cursor.x][this.cursor.y]) {
+		cursor.setPosition(i);
+
+		if (currData[cursor.moveRight()]) {
 			++aliveNeighbours;
 		}
 
-		this.cursor.moveDown();
-		if (currData[this.cursor.x][this.cursor.y]) {
+		if (currData[cursor.moveDown()]) {
 			++aliveNeighbours;
 		}
 
-		this.cursor.moveLeft();
-		if (currData[this.cursor.x][this.cursor.y]) {
+		if (currData[cursor.moveLeft()]) {
 			++aliveNeighbours;
 		}
 
-		this.cursor.moveLeft();
-		if (currData[this.cursor.x][this.cursor.y]) {
+		if (currData[cursor.moveLeft()]) {
 			++aliveNeighbours;
 		}
 
-		this.cursor.moveUp();
-		if (currData[this.cursor.x][this.cursor.y]) {
+		if (currData[cursor.moveUp()]) {
 			++aliveNeighbours;
 		}
 
-		this.cursor.moveUp();
-		if (currData[this.cursor.x][this.cursor.y]) {
+		if (currData[cursor.moveUp()]) {
 			++aliveNeighbours;
 		}
 
-		this.cursor.moveRight();
-		if (currData[this.cursor.x][this.cursor.y]) {
+		if (currData[cursor.moveRight()]) {
 			++aliveNeighbours;
 		}
 
-		this.cursor.moveRight();
-		if (currData[this.cursor.x][this.cursor.y]) {
+		if (currData[cursor.moveRight()]) {
 			++aliveNeighbours;
 		}
 
 		return aliveNeighbours;
+	}
+
+	private class Cursor {
+		private int pos;
+		private final int MAX_POS = (Model.NUM_ROWS * Model.NUM_COLS);
+
+		public void setPosition(final int pos) {
+			this.pos = pos;
+		}
+
+		public int moveRight() {
+			if (this.pos >= MAX_POS - 1) {
+				this.pos = -1;
+			}
+			return ++this.pos;
+		}
+
+		public int moveLeft() {
+			if (this.pos <= 1) {
+				this.pos = MAX_POS;
+			}
+			return --this.pos;
+		}
+
+		public int moveDown() {
+			this.pos += Model.NUM_ROWS;
+			if (this.pos > MAX_POS - 1) {
+				this.pos -= MAX_POS;
+			}
+
+			return this.pos;
+		}
+
+		public int moveUp() {
+			this.pos -= Model.NUM_ROWS;
+			if (this.pos < 0) {
+				this.pos += MAX_POS;
+			}
+			return this.pos;
+		}
 	}
 }
