@@ -20,26 +20,29 @@ public class Controller implements IController {
 	 * Start a loop updating the game.
 	 */
 	public Controller() {
-		model = new Model(50, 50, this);
-		model.initializeModel();
+		this.model = new Model(50, 50, this);
+		this.model.initializeModel();
+	}
 
+	@Override
+	public void nextTick() {
+		this.model.updateModel();
+	}
+
+	@Override
+	public void randomSeed() {
+		this.model.initializeModel();
+	}
+
+	@Override
+	public void start() {
 		final Runnable tickRunner = new Runnable() {
 			@Override
 			public void run() {
 				nextTick();
 			}
 		};
-		scheduler.scheduleAtFixedRate(tickRunner, 0, 50, TimeUnit.MILLISECONDS);
-	}
-
-	@Override
-	public void nextTick() {
-		model.updateModel();
-	}
-
-	@Override
-	public void randomSeed() {
-		model.initializeModel();
+		this.scheduler.scheduleAtFixedRate(tickRunner, 0, 50, TimeUnit.MILLISECONDS);
 	}
 
 }

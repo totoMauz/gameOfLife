@@ -28,49 +28,49 @@ public class Model implements IModel {
 	 *            the controller to pass to the view.
 	 */
 	public Model(final int x, final int y, final IController controller) {
-		view = new SwingView(controller);
+		this.view = new SwingView(controller);
 		NUM_COLS = x;
 		NUM_ROWS = y;
-		currData = new boolean[NUM_COLS * NUM_ROWS];
-		nextData = new boolean[NUM_COLS * NUM_ROWS];
-		cursor = new Cursor();
+		this.currData = new boolean[NUM_COLS * NUM_ROWS];
+		this.nextData = new boolean[NUM_COLS * NUM_ROWS];
+		this.cursor = new Cursor();
 	}
 
 	@Override
 	public void initializeModel() {
-		for (int i = 0; i < currData.length; i++) {
-			currData[i] = Math.random() >= 0.5;
+		for (int i = 0; i < this.currData.length; i++) {
+			this.currData[i] = Math.random() >= 0.5;
 		}
-		view.updateView(currData);
+		this.view.updateView(this.currData);
 	}
 
 	@Override
 	public void updateModel() {
 		getNewData();
 
-		System.arraycopy(nextData, 0, currData, 0, currData.length);
+		System.arraycopy(this.nextData, 0, this.currData, 0, this.currData.length);
 
-		view.updateView(currData);
+		this.view.updateView(this.currData);
 	}
 
 	private void getNewData() {
-		for (int i = 0; i < currData.length; i++) {
+		for (int i = 0; i < this.currData.length; i++) {
 			updateCell(i, getNumberOfAliveNeighbours(i));
 		}
 	}
 
 	private void updateCell(final int i, final int numberOfNeighbours) {
-		final boolean isCellAlive = currData[i];
+		final boolean isCellAlive = this.currData[i];
 
 		if (isCellAlive) {
 			if (numberOfNeighbours < 2 || numberOfNeighbours > 3) {
-				nextData[i] = false;
+				this.nextData[i] = false;
 			} else {
-				nextData[i] = true;
+				this.nextData[i] = true;
 			}
 		} else {
 			if (numberOfNeighbours == 3) {
-				nextData[i] = true;
+				this.nextData[i] = true;
 			}
 		}
 	}
@@ -78,37 +78,37 @@ public class Model implements IModel {
 	private int getNumberOfAliveNeighbours(final int i) {
 		int aliveNeighbours = 0;
 
-		cursor.setPosition(i);
+		this.cursor.setPosition(i);
 
-		if (currData[cursor.moveRight()]) {
+		if (this.currData[this.cursor.moveRight()]) {
 			++aliveNeighbours;
 		}
 
-		if (currData[cursor.moveDown()]) {
+		if (this.currData[this.cursor.moveDown()]) {
 			++aliveNeighbours;
 		}
 
-		if (currData[cursor.moveLeft()]) {
+		if (this.currData[this.cursor.moveLeft()]) {
 			++aliveNeighbours;
 		}
 
-		if (currData[cursor.moveLeft()]) {
+		if (this.currData[this.cursor.moveLeft()]) {
 			++aliveNeighbours;
 		}
 
-		if (currData[cursor.moveUp()]) {
+		if (this.currData[this.cursor.moveUp()]) {
 			++aliveNeighbours;
 		}
 
-		if (currData[cursor.moveUp()]) {
+		if (this.currData[this.cursor.moveUp()]) {
 			++aliveNeighbours;
 		}
 
-		if (currData[cursor.moveRight()]) {
+		if (this.currData[this.cursor.moveRight()]) {
 			++aliveNeighbours;
 		}
 
-		if (currData[cursor.moveRight()]) {
+		if (this.currData[this.cursor.moveRight()]) {
 			++aliveNeighbours;
 		}
 
@@ -119,12 +119,16 @@ public class Model implements IModel {
 		private int pos;
 		private final int MAX_POS = (Model.NUM_ROWS * Model.NUM_COLS);
 
+		public Cursor() {
+			super();
+		}
+
 		public void setPosition(final int pos) {
 			this.pos = pos;
 		}
 
 		public int moveRight() {
-			if (this.pos >= MAX_POS - 1) {
+			if (this.pos >= this.MAX_POS - 1) {
 				this.pos = -1;
 			}
 			return ++this.pos;
@@ -132,15 +136,15 @@ public class Model implements IModel {
 
 		public int moveLeft() {
 			if (this.pos <= 1) {
-				this.pos = MAX_POS;
+				this.pos = this.MAX_POS;
 			}
 			return --this.pos;
 		}
 
 		public int moveDown() {
 			this.pos += Model.NUM_ROWS;
-			if (this.pos > MAX_POS - 1) {
-				this.pos -= MAX_POS;
+			if (this.pos > this.MAX_POS - 1) {
+				this.pos -= this.MAX_POS;
 			}
 
 			return this.pos;
@@ -149,7 +153,7 @@ public class Model implements IModel {
 		public int moveUp() {
 			this.pos -= Model.NUM_ROWS;
 			if (this.pos < 0) {
-				this.pos += MAX_POS;
+				this.pos += this.MAX_POS;
 			}
 			return this.pos;
 		}

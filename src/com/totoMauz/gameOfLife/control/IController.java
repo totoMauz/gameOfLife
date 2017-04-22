@@ -13,4 +13,9 @@ public interface IController {
 	 * Initialize the game of life with random values.
 	 */
 	void randomSeed();
+
+	/**
+	 * Start the game.
+	 */
+	void start();
 }
