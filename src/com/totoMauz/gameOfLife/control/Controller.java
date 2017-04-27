@@ -5,7 +5,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import com.totoMauz.gameOfLife.model.IModel;
-import com.totoMauz.gameOfLife.model.Model;
 
 /**
  * Controller Implementation responsible for starting the game and keeping it
@@ -15,27 +14,19 @@ public class Controller implements IController {
 	private IModel model;
 	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-	/**
-	 * Initialize a new controller and implicitly a model and view as well.
-	 * Start a loop updating the game.
-	 */
-	public Controller() {
-		this.model = new Model(50, 50, this);
-		this.model.initializeModel();
-	}
-
 	@Override
 	public void nextTick() {
 		this.model.updateModel();
 	}
 
 	@Override
-	public void randomSeed() {
+	public void restart() {
 		this.model.initializeModel();
 	}
 
 	@Override
 	public void start() {
+		this.model.initializeModel();
 		final Runnable tickRunner = new Runnable() {
 			@Override
 			public void run() {
@@ -43,6 +34,11 @@ public class Controller implements IController {
 			}
 		};
 		this.scheduler.scheduleAtFixedRate(tickRunner, 0, 50, TimeUnit.MILLISECONDS);
+	}
+
+	@Override
+	public void setModel(final IModel model) {
+		this.model = model;
 	}
 
 }

@@ -1,8 +1,6 @@
 package com.totoMauz.gameOfLife.model;
 
-import com.totoMauz.gameOfLife.control.IController;
 import com.totoMauz.gameOfLife.view.IView;
-import com.totoMauz.gameOfLife.view.SwingView;
 
 /**
  * Model implementation with a simple array holding the game data. Responsible
@@ -11,115 +9,110 @@ import com.totoMauz.gameOfLife.view.SwingView;
 public class Model implements IModel {
 	public static int NUM_COLS;
 	public static int NUM_ROWS;
-	private final boolean[] currData;
-	private final boolean[] nextData;
-	private final Cursor cursor;
+	private final boolean[] currCells;
+	private final boolean[] nextCells;
+	private final CellCursor cellCursor;
 
 	private IView view;
 
 	/**
 	 * Instantiate a new model
 	 * 
-	 * @param x
+	 * @param numCols
 	 *            number of rows of the game field.
-	 * @param y
+	 * @param numRows
 	 *            number of columns of the game field.
 	 * @param controller
 	 *            the controller to pass to the view.
 	 */
-	public Model(final int x, final int y, final IController controller) {
-		this.view = new SwingView(controller);
-		NUM_COLS = x;
-		NUM_ROWS = y;
-		this.currData = new boolean[NUM_COLS * NUM_ROWS];
-		this.nextData = new boolean[NUM_COLS * NUM_ROWS];
-		this.cursor = new Cursor();
+	public Model(final int numCols, final int numRows) {
+		NUM_COLS = numCols;
+		NUM_ROWS = numRows;
+		this.currCells = new boolean[NUM_COLS * NUM_ROWS];
+		this.nextCells = new boolean[NUM_COLS * NUM_ROWS];
+		this.cellCursor = new CellCursor();
 	}
 
 	@Override
 	public void initializeModel() {
-		for (int i = 0; i < this.currData.length; i++) {
-			this.currData[i] = Math.random() >= 0.5;
+		for (int i = 0; i < this.currCells.length; i++) {
+			this.currCells[i] = Math.random() >= 0.5;
 		}
-		this.view.updateView(this.currData);
+		this.view.updateView(this.currCells);
 	}
 
 	@Override
 	public void updateModel() {
-		getNewData();
+		computeNewGameIteration();
 
-		System.arraycopy(this.nextData, 0, this.currData, 0, this.currData.length);
+		System.arraycopy(this.nextCells, 0, this.currCells, 0, this.currCells.length);
 
-		this.view.updateView(this.currData);
+		this.view.updateView(this.currCells);
 	}
 
-	private void getNewData() {
-		for (int i = 0; i < this.currData.length; i++) {
-			updateCell(i, getNumberOfAliveNeighbours(i));
+	private void computeNewGameIteration() {
+		for (int i = 0; i < this.currCells.length; i++) {
+			updateCellStatus(i, getCountOfLivingNeighbours(i));
 		}
 	}
 
-	private void updateCell(final int i, final int numberOfNeighbours) {
-		final boolean isCellAlive = this.currData[i];
-
-		if (isCellAlive) {
-			if (numberOfNeighbours < 2 || numberOfNeighbours > 3) {
-				this.nextData[i] = false;
-			} else {
-				this.nextData[i] = true;
-			}
+	private void updateCellStatus(final int i, final int livingNeighbours) {
+		if (this.currCells[i]) {
+			this.nextCells[i] = livingNeighbours == 2 || livingNeighbours == 3;
 		} else {
-			if (numberOfNeighbours == 3) {
-				this.nextData[i] = true;
-			}
+			this.nextCells[i] = livingNeighbours == 3;
 		}
 	}
 
-	private int getNumberOfAliveNeighbours(final int i) {
-		int aliveNeighbours = 0;
+	private int getCountOfLivingNeighbours(final int i) {
+		int livingNeighbours = 0;
 
-		this.cursor.setPosition(i);
+		this.cellCursor.setPosition(i);
 
-		if (this.currData[this.cursor.moveRight()]) {
-			++aliveNeighbours;
+		if (this.currCells[this.cellCursor.moveRight()]) {
+			++livingNeighbours;
 		}
 
-		if (this.currData[this.cursor.moveDown()]) {
-			++aliveNeighbours;
+		if (this.currCells[this.cellCursor.moveDown()]) {
+			++livingNeighbours;
 		}
 
-		if (this.currData[this.cursor.moveLeft()]) {
-			++aliveNeighbours;
+		if (this.currCells[this.cellCursor.moveLeft()]) {
+			++livingNeighbours;
 		}
 
-		if (this.currData[this.cursor.moveLeft()]) {
-			++aliveNeighbours;
+		if (this.currCells[this.cellCursor.moveLeft()]) {
+			++livingNeighbours;
 		}
 
-		if (this.currData[this.cursor.moveUp()]) {
-			++aliveNeighbours;
+		if (this.currCells[this.cellCursor.moveUp()]) {
+			++livingNeighbours;
 		}
 
-		if (this.currData[this.cursor.moveUp()]) {
-			++aliveNeighbours;
+		if (this.currCells[this.cellCursor.moveUp()]) {
+			++livingNeighbours;
 		}
 
-		if (this.currData[this.cursor.moveRight()]) {
-			++aliveNeighbours;
+		if (this.currCells[this.cellCursor.moveRight()]) {
+			++livingNeighbours;
 		}
 
-		if (this.currData[this.cursor.moveRight()]) {
-			++aliveNeighbours;
+		if (this.currCells[this.cellCursor.moveRight()]) {
+			++livingNeighbours;
 		}
 
-		return aliveNeighbours;
+		return livingNeighbours;
 	}
 
-	private class Cursor {
+	/**
+	 * This cursor emulates a matrix from a vector and can visit surrounding
+	 * fields.
+	 */
+	private class CellCursor {
 		private int pos;
 		private final int MAX_POS = (Model.NUM_ROWS * Model.NUM_COLS);
 
-		public Cursor() {
+		public CellCursor() {
 			super();
 		}
 
@@ -157,5 +150,10 @@ public class Model implements IModel {
 			}
 			return this.pos;
 		}
+	}
+
+	@Override
+	public void setView(final IView view) {
+		this.view = view;
 	}
 }
